@@ -14,5 +14,23 @@ namespace CardakRezervasyon.Api.Data
         public DbSet<Rezervasyon> Rezervasyonlar { get; set; } = null!;
         public DbSet<Vatandas> Vatandaslar { get; set; } = null!;
         public DbSet<BakimKapaliGun> BakimKapaliGunler { get; set; } = null!;
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Cardak: (MesireAlaniId, Numara) must be unique —
+            // you can't have two çardaks with the same number in the same park
+            modelBuilder.Entity<Cardak>()
+                .HasIndex(c => new { c.MesireAlaniId, c.Numara })
+                .IsUnique();
+
+            // Cardak: speeds up "give me active çardaks in this park" queries
+            modelBuilder.Entity<Cardak>()
+                .HasIndex(c => new { c.MesireAlaniId, c.AktifMi });
+
+            // Rezervasyon: speeds up overlap-checking queries
+            // (the most important index in the whole project)
+            modelBuilder.Entity<Rezervasyon>()
+                .HasIndex(r => new { r.CardakId, r.BaslangicZamani, r.BitisZamani });
+        }
     }
+
 }
