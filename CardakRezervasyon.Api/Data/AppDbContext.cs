@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using CardakRezervasyon.Api.Models.Entities;
 
 namespace CardakRezervasyon.Api.Data
 {
@@ -8,6 +9,10 @@ namespace CardakRezervasyon.Api.Data
         {
         }
 
-        // We'll add DbSet<T> properties here once we create our entities (next milestone)
+        public DbSet<MesireAlani> MesireAlanlari { get; set; } = null!;
+        public DbSet<Cardak> Cardaklar { get; set; } = null!;
+        public DbSet<Rezervasyon> Rezervasyonlar { get; set; } = null!;
+        public DbSet<Vatandas> Vatandaslar { get; set; } = null!;
+        public DbSet<BakimKapaliGun> BakimKapaliGunler { get; set; } = null!;
     }
 }
