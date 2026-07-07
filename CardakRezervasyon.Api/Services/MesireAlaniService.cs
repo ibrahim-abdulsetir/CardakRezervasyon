@@ -1,4 +1,5 @@
 ﻿using CardakRezervasyon.Api.DTOs.MesireAlanlari;
+using CardakRezervasyon.Api.Models.Entities;
 using CardakRezervasyon.Api.Repositories;
 
 namespace CardakRezervasyon.Api.Services
@@ -45,6 +46,33 @@ namespace CardakRezervasyon.Api.Services
                 AktifMi = alan.AktifMi,
                 ToplamCardakSayisi = alan.Cardaklar.Count,
                 AktifCardakSayisi = alan.Cardaklar.Count(c => c.AktifMi)
+            };
+        }
+        public async Task<MesireAlaniDetailDto> CreateAsync(CreateMesireAlaniDto dto)
+        {
+            var entity = new MesireAlani
+            {
+                Ad = dto.Ad,
+                Aciklama = dto.Aciklama,
+                Mahalle = dto.Mahalle,
+                AcilisSaati = dto.AcilisSaati,
+                KapanisSaati = dto.KapanisSaati,
+                AktifMi = true // new parks always start active — the client doesn't decide this
+            };
+
+            var saved = await _repository.AddAsync(entity);
+
+            return new MesireAlaniDetailDto
+            {
+                Id = saved.Id,
+                Ad = saved.Ad,
+                Aciklama = saved.Aciklama,
+                Mahalle = saved.Mahalle,
+                AcilisSaati = saved.AcilisSaati,
+                KapanisSaati = saved.KapanisSaati,
+                AktifMi = saved.AktifMi,
+                ToplamCardakSayisi = 0,   // brand new park has no çardaks yet
+                AktifCardakSayisi = 0
             };
         }
     }

@@ -6,5 +6,6 @@ namespace CardakRezervasyon.Api.Services
     {
         Task<List<MesireAlaniListDto>> GetAllAsync();
         Task<MesireAlaniDetailDto?> GetByIdAsync(int id);
+        Task<MesireAlaniDetailDto> CreateAsync(CreateMesireAlaniDto dto);
     }
 }

@@ -27,5 +27,12 @@ namespace CardakRezervasyon.Api.Repositories
                 .Include(m => m.Cardaklar)
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
+        public async Task<MesireAlani> AddAsync(MesireAlani mesireAlani)
+        {
+            _context.MesireAlanlari.Add(mesireAlani);
+            await _context.SaveChangesAsync();
+            return mesireAlani;
+        }
+
     }
 }

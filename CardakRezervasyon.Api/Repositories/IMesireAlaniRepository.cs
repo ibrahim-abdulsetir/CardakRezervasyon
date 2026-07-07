@@ -6,5 +6,6 @@ namespace CardakRezervasyon.Api.Repositories
     {
         Task<List<MesireAlani>> GetAllAsync();
         Task<MesireAlani?> GetByIdAsync(int id);
+        Task<MesireAlani> AddAsync(MesireAlani mesireAlani);
     }
 }

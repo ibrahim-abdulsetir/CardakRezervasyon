@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CardakRezervasyon.Api.DTOs.MesireAlanlari;
 using CardakRezervasyon.Api.Services;
+using Microsoft.AspNetCore.Mvc;
+using CardakRezervasyon.Api.DTOs.MesireAlanlari;
 
 namespace CardakRezervasyon.Api.Controllers
 {
@@ -32,6 +34,12 @@ namespace CardakRezervasyon.Api.Controllers
             }
 
             return Ok(result);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateMesireAlaniDto dto)
+        {
+            var result = await _service.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
     }
 }
