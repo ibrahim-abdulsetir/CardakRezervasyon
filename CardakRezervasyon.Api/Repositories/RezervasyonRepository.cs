@@ -37,5 +37,37 @@ namespace CardakRezervasyon.Api.Repositories
             await _context.SaveChangesAsync();
             return rezervasyon;
         }
+        public async Task<Rezervasyon?> GetByIdAsync(int id)
+        {
+            return await _context.Rezervasyonlar
+                .AsNoTracking()
+                .FirstOrDefaultAsync(r => r.Id == id);
+        }
+
+        public async Task<(List<Rezervasyon> Items, int TotalCount)> GetPagedAsync(
+            int page, int pageSize, int? cardakId, RezervasyonDurumu? durum)
+        {
+            var query = _context.Rezervasyonlar.AsNoTracking();
+
+            if (cardakId.HasValue)
+            {
+                query = query.Where(r => r.CardakId == cardakId.Value);
+            }
+
+            if (durum.HasValue)
+            {
+                query = query.Where(r => r.Durum == durum.Value);
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(r => r.OlusturmaTarihi)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (items, totalCount);
+        }
     }
 }

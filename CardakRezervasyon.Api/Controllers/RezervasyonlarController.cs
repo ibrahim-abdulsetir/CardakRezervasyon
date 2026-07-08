@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CardakRezervasyon.Api.DTOs.Rezervasyonlar;
 using CardakRezervasyon.Api.Services;
+using CardakRezervasyon.Api.Models.Entities;
 
 namespace CardakRezervasyon.Api.Controllers
 {
@@ -29,10 +30,27 @@ namespace CardakRezervasyon.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            // Placeholder for now — we'll properly implement this in the next step (15.7, List/Detail)
-            return Ok();
+            var result = await _service.GetByIdAsync(id);
+
+            if (result == null)
+            {
+                return NotFound($"Rezervasyon with id {id} not found.");
+            }
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPaged(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20,
+            [FromQuery] int? cardakId = null,
+            [FromQuery] RezervasyonDurumu? durum = null)
+        {
+            var result = await _service.GetPagedAsync(page, pageSize, cardakId, durum);
+            return Ok(result);
         }
     }
 }

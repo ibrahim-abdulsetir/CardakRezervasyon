@@ -1,6 +1,8 @@
-﻿using CardakRezervasyon.Api.DTOs.Rezervasyonlar;
+﻿using CardakRezervasyon.Api.DTOs;
+using CardakRezervasyon.Api.DTOs.Rezervasyonlar;
 using CardakRezervasyon.Api.Models.Entities;
 using CardakRezervasyon.Api.Repositories;
+
 
 namespace CardakRezervasyon.Api.Services
 {
@@ -73,6 +75,51 @@ namespace CardakRezervasyon.Api.Services
             };
 
             return (resultDto, null);
+        }
+        public async Task<RezervasyonDetailDto?> GetByIdAsync(int id)
+        {
+            var rezervasyon = await _repository.GetByIdAsync(id);
+
+            if (rezervasyon == null)
+            {
+                return null;
+            }
+
+            return new RezervasyonDetailDto
+            {
+                Id = rezervasyon.Id,
+                CardakId = rezervasyon.CardakId,
+                VatandasId = rezervasyon.VatandasId,
+                BaslangicZamani = rezervasyon.BaslangicZamani,
+                BitisZamani = rezervasyon.BitisZamani,
+                KisiSayisi = rezervasyon.KisiSayisi,
+                Durum = rezervasyon.Durum,
+                Not = rezervasyon.Not
+            };
+        }
+
+        public async Task<PagedResult<RezervasyonDetailDto>> GetPagedAsync(
+            int page, int pageSize, int? cardakId, RezervasyonDurumu? durum)
+        {
+            var (items, totalCount) = await _repository.GetPagedAsync(page, pageSize, cardakId, durum);
+
+            return new PagedResult<RezervasyonDetailDto>
+            {
+                Items = items.Select(r => new RezervasyonDetailDto
+                {
+                    Id = r.Id,
+                    CardakId = r.CardakId,
+                    VatandasId = r.VatandasId,
+                    BaslangicZamani = r.BaslangicZamani,
+                    BitisZamani = r.BitisZamani,
+                    KisiSayisi = r.KisiSayisi,
+                    Durum = r.Durum,
+                    Not = r.Not
+                }).ToList(),
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
         }
     }
 }
