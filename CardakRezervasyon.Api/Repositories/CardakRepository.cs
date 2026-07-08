@@ -54,5 +54,29 @@ namespace CardakRezervasyon.Api.Repositories
             await _context.SaveChangesAsync();
             return cardak;
         }
+        public async Task<(int AktifCount, int DoluCount)> GetBoslukSayilariAsync(
+    int mesireAlaniId, DateTime baslangic, DateTime bitis)
+        {
+            var aktifDurumlar = new[] { RezervasyonDurumu.Beklemede, RezervasyonDurumu.Onaylandi };
+
+            // Step 1: how many active çardaks does this park have in total?
+            var aktifCount = await _context.Cardaklar
+                .AsNoTracking()
+                .Where(c => c.MesireAlaniId == mesireAlaniId && c.AktifMi)
+                .CountAsync();
+
+            // Step 2: how many DISTINCT çardaks (in this park) have an overlapping
+            // active reservation in the requested time range?
+            var doluCount = await _context.Rezervasyonlar
+                .AsNoTracking()
+                .Where(r => r.Cardak.MesireAlaniId == mesireAlaniId)
+                .Where(r => aktifDurumlar.Contains(r.Durum))
+                .Where(r => baslangic < r.BitisZamani && bitis > r.BaslangicZamani)
+                .Select(r => r.CardakId)
+                .Distinct()
+                .CountAsync();
+
+            return (aktifCount, doluCount);
+        }
     }
 }

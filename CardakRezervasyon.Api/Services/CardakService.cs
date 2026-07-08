@@ -1,5 +1,6 @@
 ﻿using CardakRezervasyon.Api.DTOs;
 using CardakRezervasyon.Api.DTOs.Cardaklar;
+using CardakRezervasyon.Api.DTOs.MesireAlanlari;
 using CardakRezervasyon.Api.Models.Entities;
 using CardakRezervasyon.Api.Repositories;
 
@@ -71,6 +72,26 @@ namespace CardakRezervasyon.Api.Services
                 Kapasite = saved.Kapasite,
                 MangalliMi = saved.MangalliMi,
                 AktifMi = saved.AktifMi
+            };
+        }
+        public async Task<BoslukDto?> GetBoslukAsync(int mesireAlaniId, DateTime baslangic, DateTime bitis)
+        {
+            var park = await _repository.GetParkByIdAsync(mesireAlaniId);
+            if (park == null)
+            {
+                return null; // park doesn't exist — Controller will return 404
+            }
+
+            var (aktifCount, doluCount) = await _repository.GetBoslukSayilariAsync(mesireAlaniId, baslangic, bitis);
+
+            return new BoslukDto
+            {
+                MesireAlaniId = mesireAlaniId,
+                Baslangic = baslangic,
+                Bitis = bitis,
+                AktifCardakSayisi = aktifCount,
+                DoluCardakSayisi = doluCount,
+                BosCardakSayisi = aktifCount - doluCount
             };
         }
     }

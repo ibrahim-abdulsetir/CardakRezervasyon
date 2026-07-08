@@ -1,7 +1,6 @@
 ﻿using CardakRezervasyon.Api.DTOs.MesireAlanlari;
 using CardakRezervasyon.Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using CardakRezervasyon.Api.DTOs.MesireAlanlari;
 
 namespace CardakRezervasyon.Api.Controllers
 {
@@ -11,9 +10,12 @@ namespace CardakRezervasyon.Api.Controllers
     {
         private readonly IMesireAlaniService _service;
 
-        public MesireAlanlariController(IMesireAlaniService service)
+        private readonly ICardakService _cardakService;
+
+        public MesireAlanlariController(IMesireAlaniService service, ICardakService cardakService)
         {
             _service = service;
+            _cardakService = cardakService;
         }
 
         [HttpGet]
@@ -40,6 +42,23 @@ namespace CardakRezervasyon.Api.Controllers
         {
             var result = await _service.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        }
+        [HttpGet("{id}/bosluk")]
+        public async Task<IActionResult> GetBosluk(int id, [FromQuery] DateTime baslangic, [FromQuery] DateTime bitis)
+        {
+            if (bitis <= baslangic)
+            {
+                return BadRequest(new { message = "Bitis zamani baslangic zamanindan sonra olmalidir." });
+            }
+
+            var result = await _cardakService.GetBoslukAsync(id, baslangic, bitis);
+
+            if (result == null)
+            {
+                return NotFound($"MesireAlani with id {id} not found.");
+            }
+
+            return Ok(result);
         }
     }
 }

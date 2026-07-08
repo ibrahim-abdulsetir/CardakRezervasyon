@@ -10,5 +10,7 @@ namespace CardakRezervasyon.Api.Repositories
         Task<MesireAlani?> GetParkByIdAsync(int mesireAlaniId);
 
         Task<Cardak> AddAsync(Cardak cardak);
+        Task<(int AktifCount, int DoluCount)> GetBoslukSayilariAsync(
+    int mesireAlaniId, DateTime baslangic, DateTime bitis);
     }
 }
