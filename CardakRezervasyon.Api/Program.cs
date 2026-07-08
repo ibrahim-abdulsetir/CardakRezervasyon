@@ -21,6 +21,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<IRezervasyonRepository, RezervasyonRepository>();
+builder.Services.AddScoped<IRezervasyonService, RezervasyonService>();
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
