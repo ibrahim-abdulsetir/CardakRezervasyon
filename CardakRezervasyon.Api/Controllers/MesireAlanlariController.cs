@@ -40,7 +40,13 @@ namespace CardakRezervasyon.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateMesireAlaniDto dto)
         {
-            var result = await _service.CreateAsync(dto);
+            var (result, hataMesaji) = await _service.CreateAsync(dto);
+
+            if (result == null)
+            {
+                return BadRequest(new { message = hataMesaji });
+            }
+
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
         [HttpGet("{id}/bosluk")]

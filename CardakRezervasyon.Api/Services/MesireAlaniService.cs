@@ -15,7 +15,7 @@ namespace CardakRezervasyon.Api.Services
  
         public async Task<List<MesireAlaniListDto>> GetAllAsync()
         {
-            throw new Exception("Test error for middleware");
+         
 
             var alanlar = await _repository.GetAllAsync();
 
@@ -50,8 +50,23 @@ namespace CardakRezervasyon.Api.Services
                 AktifCardakSayisi = alan.Cardaklar.Count(c => c.AktifMi)
             };
         }
-        public async Task<MesireAlaniDetailDto> CreateAsync(CreateMesireAlaniDto dto)
+        public async Task<(MesireAlaniDetailDto? Result, string? HataMesaji)> CreateAsync(CreateMesireAlaniDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.Ad))
+            {
+                return (null, "Ad (park name) cannot be empty.");
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.Mahalle))
+            {
+                return (null, "Mahalle cannot be empty.");
+            }
+
+            if (dto.KapanisSaati <= dto.AcilisSaati)
+            {
+                return (null, "KapanisSaati must be after AcilisSaati.");
+            }
+
             var entity = new MesireAlani
             {
                 Ad = dto.Ad,
@@ -59,12 +74,12 @@ namespace CardakRezervasyon.Api.Services
                 Mahalle = dto.Mahalle,
                 AcilisSaati = dto.AcilisSaati,
                 KapanisSaati = dto.KapanisSaati,
-                AktifMi = true // new parks always start active — the client doesn't decide this
+                AktifMi = true
             };
 
             var saved = await _repository.AddAsync(entity);
 
-            return new MesireAlaniDetailDto
+            var resultDto = new MesireAlaniDetailDto
             {
                 Id = saved.Id,
                 Ad = saved.Ad,
@@ -73,9 +88,11 @@ namespace CardakRezervasyon.Api.Services
                 AcilisSaati = saved.AcilisSaati,
                 KapanisSaati = saved.KapanisSaati,
                 AktifMi = saved.AktifMi,
-                ToplamCardakSayisi = 0,   // brand new park has no çardaks yet
+                ToplamCardakSayisi = 0,
                 AktifCardakSayisi = 0
             };
+
+            return (resultDto, null);
         }
     }
 }
