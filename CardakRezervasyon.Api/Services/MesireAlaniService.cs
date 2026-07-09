@@ -12,9 +12,11 @@ namespace CardakRezervasyon.Api.Services
         {
             _repository = repository;
         }
-
+ 
         public async Task<List<MesireAlaniListDto>> GetAllAsync()
         {
+            throw new Exception("Test error for middleware");
+
             var alanlar = await _repository.GetAllAsync();
 
             return alanlar.Select(a => new MesireAlaniListDto
