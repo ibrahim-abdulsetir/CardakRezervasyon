@@ -9,7 +9,7 @@ namespace CardakRezervasyon.Api.Services
         Task<PagedResult<CardakListDto>?> GetPagedByParkAsync(
             int mesireAlaniId, int page, int pageSize, string? blok, int? minKapasite);
 
-        Task<CardakListDto?> CreateAsync(int mesireAlaniId, CreateCardakDto dto);
+        Task<(CardakListDto? Result, string? HataMesaji)> CreateAsync(int mesireAlaniId, CreateCardakDto dto);
         Task<BoslukDto?> GetBoslukAsync(int mesireAlaniId, DateTime baslangic, DateTime bitis);
     }
 }

@@ -44,14 +44,28 @@ namespace CardakRezervasyon.Api.Services
             };
         }
 
-        public async Task<CardakListDto?> CreateAsync(int mesireAlaniId, CreateCardakDto dto)
+        public async Task<(CardakListDto? Result, string? HataMesaji)> CreateAsync(int mesireAlaniId, CreateCardakDto dto)
         {
+            // Rule 1: park must exist
             var park = await _repository.GetParkByIdAsync(mesireAlaniId);
             if (park == null)
             {
-                return null; // park doesn't exist — Controller will return 404
+                return (null, $"MesireAlani with id {mesireAlaniId} not found.");
             }
 
+            // Rule 2: Numara must be positive
+            if (dto.Numara <= 0)
+            {
+                return (null, "Numara must be a positive number.");
+            }
+
+            // Rule 3: Kapasite must be positive
+            if (dto.Kapasite <= 0)
+            {
+                return (null, "Kapasite must be a positive number.");
+            }
+
+            // All checks passed — create the çardak
             var entity = new Cardak
             {
                 MesireAlaniId = mesireAlaniId,
@@ -64,7 +78,7 @@ namespace CardakRezervasyon.Api.Services
 
             var saved = await _repository.AddAsync(entity);
 
-            return new CardakListDto
+            var resultDto = new CardakListDto
             {
                 Id = saved.Id,
                 Numara = saved.Numara,
@@ -73,6 +87,8 @@ namespace CardakRezervasyon.Api.Services
                 MangalliMi = saved.MangalliMi,
                 AktifMi = saved.AktifMi
             };
+
+            return (resultDto, null);
         }
         public async Task<BoslukDto?> GetBoslukAsync(int mesireAlaniId, DateTime baslangic, DateTime bitis)
         {

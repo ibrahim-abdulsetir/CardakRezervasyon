@@ -35,13 +35,25 @@ namespace CardakRezervasyon.Api.Services
                 return (null, "Cannot create a reservation in the past.");
             }
 
-            // Rule 3: end time must be after start time (basic sanity check)
+            // Rule 3: end time must be after start time
             if (dto.BitisZamani <= dto.BaslangicZamani)
             {
                 return (null, "End time must be after start time.");
             }
 
-            // Rule 4: no overlap with existing active reservations
+            // Rule 4: KisiSayisi must be positive
+            if (dto.KisiSayisi <= 0)
+            {
+                return (null, "KisiSayisi must be a positive number.");
+            }
+
+            // Rule 5: KisiSayisi cannot exceed the çardak's capacity
+            if (dto.KisiSayisi > cardak.Kapasite)
+            {
+                return (null, $"KisiSayisi ({dto.KisiSayisi}) exceeds this çardak's Kapasite ({cardak.Kapasite}).");
+            }
+
+            // Rule 6: no overlap with existing active reservations
             var overlap = await _repository.HasOverlapAsync(dto.CardakId, dto.BaslangicZamani, dto.BitisZamani);
             if (overlap)
             {

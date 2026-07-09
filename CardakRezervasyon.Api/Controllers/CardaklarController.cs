@@ -34,13 +34,14 @@ namespace CardakRezervasyon.Api.Controllers
         }
 
         [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> Create(int mesireAlaniId, [FromBody] CreateCardakDto dto)
         {
-            var result = await _service.CreateAsync(mesireAlaniId, dto);
+            var (result, hataMesaji) = await _service.CreateAsync(mesireAlaniId, dto);
 
             if (result == null)
             {
-                return NotFound($"MesireAlani with id {mesireAlaniId} not found.");
+                return BadRequest(new { message = hataMesaji });
             }
 
             return CreatedAtAction(nameof(GetPaged), new { mesireAlaniId }, result);
