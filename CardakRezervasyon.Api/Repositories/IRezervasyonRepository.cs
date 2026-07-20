@@ -13,5 +13,8 @@ namespace CardakRezervasyon.Api.Repositories
 
         Task<(List<Rezervasyon> Items, int TotalCount)> GetPagedAsync(
             int page, int pageSize, int? cardakId, RezervasyonDurumu? durum);
+        Task<MesireAlani?> GetParkByCardakIdAsync(int cardakId);
+
+        Task<bool> HasKapaliGunAsync(int mesireAlaniId, DateTime baslangic, DateTime bitis);
     }
 }

@@ -52,7 +52,25 @@ namespace CardakRezervasyon.Api.Services
             {
                 return (null, $"KisiSayisi ({dto.KisiSayisi}) exceeds this çardak's Kapasite ({cardak.Kapasite}).");
             }
+            // Rule: reservation must be within the park's opening hours
+            var park = await _repository.GetParkByCardakIdAsync(dto.CardakId);
+            if (park != null)
+            {
+                var baslangicSaat = dto.BaslangicZamani.TimeOfDay;
+                var bitisSaat = dto.BitisZamani.TimeOfDay;
 
+                if (baslangicSaat < park.AcilisSaati || bitisSaat > park.KapanisSaati)
+                {
+                    return (null, $"Reservation must be within opening hours ({park.AcilisSaati} - {park.KapanisSaati}).");
+                }
+            }
+
+            // Rule: cannot reserve during a maintenance closed period
+            var kapaliGunVar = await _repository.HasKapaliGunAsync(park!.Id, dto.BaslangicZamani, dto.BitisZamani);
+            if (kapaliGunVar)
+            {
+                return (null, "This park is closed for maintenance during the requested time.");
+            }
             // Rule 6: no overlap with existing active reservations
             var overlap = await _repository.HasOverlapAsync(dto.CardakId, dto.BaslangicZamani, dto.BitisZamani);
             if (overlap)

@@ -69,5 +69,21 @@ namespace CardakRezervasyon.Api.Repositories
 
             return (items, totalCount);
         }
+        public async Task<MesireAlani?> GetParkByCardakIdAsync(int cardakId)
+        {
+            return await _context.Cardaklar
+                .AsNoTracking()
+                .Where(c => c.Id == cardakId)
+                .Select(c => c.MesireAlani)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> HasKapaliGunAsync(int mesireAlaniId, DateTime baslangic, DateTime bitis)
+        {
+            return await _context.BakimKapaliGunler
+                .AsNoTracking()
+                .Where(k => k.MesireAlaniId == mesireAlaniId)
+                .AnyAsync(k => baslangic < k.BitisTarihi && bitis > k.BaslangicTarihi);
+        }
     }
 }
