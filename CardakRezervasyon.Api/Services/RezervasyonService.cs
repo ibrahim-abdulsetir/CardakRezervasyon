@@ -30,7 +30,7 @@ namespace CardakRezervasyon.Api.Services
             }
 
             // Rule 2: cannot reserve in the past
-            if (dto.BaslangicZamani < DateTime.Now)
+            if (dto.BaslangicZamani < DateTime.UtcNow)
             {
                 return (null, "Cannot create a reservation in the past.");
             }
