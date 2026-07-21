@@ -14,6 +14,7 @@ namespace CardakRezervasyon.Api.Data
         public DbSet<Rezervasyon> Rezervasyonlar { get; set; } = null!;
         public DbSet<Vatandas> Vatandaslar { get; set; } = null!;
         public DbSet<BakimKapaliGun> BakimKapaliGunler { get; set; } = null!;
+        public DbSet<DogrulamaKodu> DogrulamaKodlari { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Cardak: (MesireAlaniId, Numara) must be unique —
@@ -34,6 +35,7 @@ namespace CardakRezervasyon.Api.Data
             modelBuilder.Entity<Vatandas>()
                 .HasIndex(v => v.Eposta)
                 .IsUnique();
+
         }
     }
 
