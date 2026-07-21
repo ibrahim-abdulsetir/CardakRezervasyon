@@ -28,6 +28,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IRezervasyonRepository, RezervasyonRepository>();
 builder.Services.AddScoped<IRezervasyonService, RezervasyonService>();
 
+builder.Services.AddScoped<IVatandasRepository, VatandasRepository>();
+builder.Services.AddScoped<IVatandasService, VatandasService>();
+
 var app = builder.Build();
 
 app.UseMiddleware<CardakRezervasyon.Api.Middleware.ErrorHandlingMiddleware>();
