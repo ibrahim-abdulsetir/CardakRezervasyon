@@ -27,5 +27,17 @@ namespace CardakRezervasyon.Api.Controllers
 
             return CreatedAtAction(nameof(Register), result);
         }
+        [HttpPost("giris")]
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
+        {
+            var (basarili, mesaj) = await _service.LoginAsync(dto);
+
+            if (!basarili)
+            {
+                return BadRequest(new { message = mesaj });
+            }
+
+            return Ok(new { message = mesaj });
+        }
     }
 }

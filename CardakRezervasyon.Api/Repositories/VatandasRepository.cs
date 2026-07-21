@@ -26,5 +26,25 @@ namespace CardakRezervasyon.Api.Repositories
             await _context.SaveChangesAsync();
             return vatandas;
         }
+        public async Task InvalidateEskiKodlarAsync(int vatandasId)
+        {
+            var eskiKodlar = await _context.DogrulamaKodlari
+                .Where(k => k.VatandasId == vatandasId && !k.KullanildiMi)
+                .ToListAsync();
+
+            foreach (var kod in eskiKodlar)
+            {
+                kod.KullanildiMi = true;
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<DogrulamaKodu> AddKodAsync(DogrulamaKodu kod)
+        {
+            _context.DogrulamaKodlari.Add(kod);
+            await _context.SaveChangesAsync();
+            return kod;
+        }
     }
 }

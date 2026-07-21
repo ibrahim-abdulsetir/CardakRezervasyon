@@ -2,6 +2,7 @@ using CardakRezervasyon.Api.Data;
 using CardakRezervasyon.Api.Repositories;
 using CardakRezervasyon.Api.Services;
 using Microsoft.EntityFrameworkCore;
+using CardakRezervasyon.Api.Services.Email;
 using CardakRezervasyon.Api.Repositories;
 using CardakRezervasyon.Api.Services;
 
@@ -29,7 +30,10 @@ builder.Services.AddScoped<IRezervasyonRepository, RezervasyonRepository>();
 builder.Services.AddScoped<IRezervasyonService, RezervasyonService>();
 
 builder.Services.AddScoped<IVatandasRepository, VatandasRepository>();
+
 builder.Services.AddScoped<IVatandasService, VatandasService>();
+
+builder.Services.AddScoped<IEmailService, FakeEmailService>();
 
 var app = builder.Build();
 
