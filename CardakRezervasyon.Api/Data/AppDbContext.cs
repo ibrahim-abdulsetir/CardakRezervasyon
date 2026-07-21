@@ -30,6 +30,10 @@ namespace CardakRezervasyon.Api.Data
             // (the most important index in the whole project)
             modelBuilder.Entity<Rezervasyon>()
                 .HasIndex(r => new { r.CardakId, r.BaslangicZamani, r.BitisZamani });
+            // Vatandas: Eposta must be unique — no two citizens can share the same email
+            modelBuilder.Entity<Vatandas>()
+                .HasIndex(v => v.Eposta)
+                .IsUnique();
         }
     }
 

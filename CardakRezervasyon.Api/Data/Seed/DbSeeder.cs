@@ -53,10 +53,13 @@ namespace CardakRezervasyon.Api.Data.Seed
             {
                 vatandaslar.Add(new Vatandas
                 {
-                    AdSoyad = $"Vatandas {i}",
+                    Ad = $"Vatandas{i}",
+                    Soyad = $"Soyadi{i}",
                     Telefon = $"05{random.Next(100000000, 999999999)}",
                     TcKimlikNo = random.Next(10000000, 99999999).ToString(),
-                    Eposta = $"vatandas{i}@example.com"
+                    Eposta = $"vatandas{i}@example.com",
+                    ParolaHash = "SEED_PLACEHOLDER_HASH",
+                    AktifMi = true
                 });
             }
 
