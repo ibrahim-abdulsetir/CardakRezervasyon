@@ -13,6 +13,8 @@ namespace CardakRezervasyon.Api.Models.Entities
         public string ParolaHash { get; set; } = string.Empty;
         public bool AktifMi { get; set; } = true;
         public string? Token { get; set; }
+        public int BasarisizGirisSayisi { get; set; } = 0;
+        public DateTime? KilitlenmeZamani { get; set; }
 
         public ICollection<Rezervasyon> Rezervasyonlar { get; set; } = new List<Rezervasyon>();
     }

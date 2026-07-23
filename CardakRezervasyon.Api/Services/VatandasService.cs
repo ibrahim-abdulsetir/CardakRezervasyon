@@ -12,6 +12,8 @@ namespace CardakRezervasyon.Api.Services
         private readonly PasswordHasher<Vatandas> _passwordHasher;
         private readonly IEmailService _emailService;
 
+        private const int MaksimumBasarisizGiris = 5;
+        private const int KilitlenmeDakika = 15;
         public VatandasService(IVatandasRepository repository, IEmailService emailService)
         {
             _repository = repository;
@@ -67,7 +69,7 @@ namespace CardakRezervasyon.Api.Services
         }
         public async Task<(bool Basarili, string Mesaj)> LoginAsync(LoginDto dto)
         {
-            const string genericHataMesaji = "Eposta veya parola hatali."; // deliberately vague, on purpose
+            const string genericHataMesaji = "Eposta veya parola hatali.";
 
             var vatandas = await _repository.GetByEpostaAsync(dto.Eposta);
             if (vatandas == null)
@@ -80,16 +82,36 @@ namespace CardakRezervasyon.Api.Services
                 return (false, genericHataMesaji);
             }
 
+            // Rule: if currently locked, reject immediately without even checking the password
+            if (vatandas.KilitlenmeZamani.HasValue && vatandas.KilitlenmeZamani.Value > DateTime.UtcNow)
+            {
+                var kalanDakika = (vatandas.KilitlenmeZamani.Value - DateTime.UtcNow).TotalMinutes;
+                return (false, $"Hesap kilitli. Lutfen {Math.Ceiling(kalanDakika)} dakika sonra tekrar deneyin.");
+            }
+
             var dogrulamaSonucu = _passwordHasher.VerifyHashedPassword(vatandas, vatandas.ParolaHash, dto.Parola);
             if (dogrulamaSonucu == PasswordVerificationResult.Failed)
             {
+                vatandas.BasarisizGirisSayisi += 1;
+
+                if (vatandas.BasarisizGirisSayisi >= MaksimumBasarisizGiris)
+                {
+                    vatandas.KilitlenmeZamani = DateTime.UtcNow.AddMinutes(KilitlenmeDakika);
+                }
+
+                await _repository.UpdateAsync(vatandas);
+
                 return (false, genericHataMesaji);
             }
 
-            // Password correct — invalidate old codes, generate a new one
+            // Successful login — reset failure tracking
+            vatandas.BasarisizGirisSayisi = 0;
+            vatandas.KilitlenmeZamani = null;
+            await _repository.UpdateAsync(vatandas);
+
             await _repository.InvalidateEskiKodlarAsync(vatandas.Id);
 
-            var kod = new Random().Next(0, 1000000).ToString("D6"); // always exactly 6 digits, zero-padded
+            var kod = new Random().Next(0, 1000000).ToString("D6");
 
             var dogrulamaKodu = new DogrulamaKodu
             {
@@ -100,7 +122,6 @@ namespace CardakRezervasyon.Api.Services
             };
 
             await _repository.AddKodAsync(dogrulamaKodu);
-
             await _emailService.SendDogrulamaKoduAsync(vatandas.Eposta, kod);
 
             return (true, "Dogrulama kodu epostaniza gonderildi.");
