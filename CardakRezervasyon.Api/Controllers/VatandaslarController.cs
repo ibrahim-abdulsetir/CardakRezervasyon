@@ -39,5 +39,17 @@ namespace CardakRezervasyon.Api.Controllers
 
             return Ok(new { message = mesaj });
         }
+        [HttpPost("dogrula")]
+        public async Task<IActionResult> VerifyKodu([FromBody] VerifyKoduDto dto)
+        {
+            var (token, hataMesaji) = await _service.VerifyKoduAsync(dto);
+
+            if (token == null)
+            {
+                return BadRequest(new { message = hataMesaji });
+            }
+
+            return Ok(new TokenDto { Token = token });
+        }
     }
 }

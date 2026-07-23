@@ -6,5 +6,7 @@ namespace CardakRezervasyon.Api.Services
     {
         Task<(VatandasDto? Result, string? HataMesaji)> RegisterAsync(RegisterVatandasDto dto);
         Task<(bool Basarili, string Mesaj)> LoginAsync(LoginDto dto);
+
+        Task<(string? Token, string? HataMesaji)> VerifyKoduAsync(VerifyKoduDto dto);
     }
 }

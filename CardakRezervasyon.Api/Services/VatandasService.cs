@@ -105,5 +105,33 @@ namespace CardakRezervasyon.Api.Services
 
             return (true, "Dogrulama kodu epostaniza gonderildi.");
         }
+        public async Task<(string? Token, string? HataMesaji)> VerifyKoduAsync(VerifyKoduDto dto)
+        {
+            var vatandas = await _repository.GetByEpostaAsync(dto.Eposta);
+            if (vatandas == null)
+            {
+                return (null, "Kod gecersiz veya suresi dolmus."); // same vague message, no info leakage
+            }
+
+            var kod = await _repository.GetGecerliKoduAsync(vatandas.Id, dto.Kod);
+            if (kod == null)
+            {
+                return (null, "Kod gecersiz veya suresi dolmus.");
+            }
+
+            if (kod.SonGecerlilikZamani < DateTime.UtcNow)
+            {
+                return (null, "Kod gecersiz veya suresi dolmus.");
+            }
+
+            // Code is valid — mark it used, generate a token, save it
+            await _repository.MarkKoduKullanildiAsync(kod);
+
+            var token = Guid.NewGuid().ToString("N"); // random 32-character string, no dashes
+            vatandas.Token = token;
+            await _repository.UpdateAsync(vatandas);
+
+            return (token, null);
+        }
     }
 }

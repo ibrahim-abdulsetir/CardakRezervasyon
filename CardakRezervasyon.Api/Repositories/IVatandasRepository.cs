@@ -10,6 +10,11 @@ namespace CardakRezervasyon.Api.Repositories
         Task InvalidateEskiKodlarAsync(int vatandasId);
 
         Task<DogrulamaKodu> AddKodAsync(DogrulamaKodu kod);
+        Task<DogrulamaKodu?> GetGecerliKoduAsync(int vatandasId, string kod);
+
+        Task UpdateAsync(Vatandas vatandas);
+
+        Task MarkKoduKullanildiAsync(DogrulamaKodu kod);
     }
 
 }
